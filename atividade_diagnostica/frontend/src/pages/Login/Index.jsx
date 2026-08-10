@@ -1,7 +1,51 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Login = () => {
+
+    const [email, setEmail] = useState("")
+    const [senha, setSenha] = useState("")
+
+    const navigate = useNavigate();
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        const usuarioLogin = {
+            email,
+            senha
+        };
+
+        try {
+            const resposta = await fetch("http://localhost:3000/usuarios/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(usuarioLogin)
+            });
+
+            const dados = await resposta.json();
+
+            if (resposta.ok) {
+                localStorage.setItem(
+                    "usuario",
+                    JSON.stringify(dados.usuario)
+                );
+
+                navigate("/home");
+
+            } else {
+                alert(dados.erro);
+            }
+
+        } catch (error) {
+            console.log("Erro:", error);
+            alert("Erro ao conectar com o servidor");
+        }
+    };
+
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-white px-4">
             <div className="w-full max-w-md rounded-xl p-8">
@@ -9,7 +53,7 @@ const Login = () => {
                     Entre com sua conta
                 </h1>
 
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleLogin}>
                     <div>
                         <label
                             htmlFor="email"
@@ -22,6 +66,8 @@ const Login = () => {
                             id="email"
                             placeholder="Digite seu e-mail"
                             className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#189aa4] focus:border-transparent"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
@@ -37,11 +83,14 @@ const Login = () => {
                             id="password"
                             placeholder="Digite sua senha"
                             className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#189aa4] focus:border-transparent"
+                            value={senha}
+                            onChange={(e) => setSenha(e.target.value)}
                         />
                     </div>
 
                     <button
                         className="w-full bg-[#13838c] text-white py-2.5 rounded-lg hover:bg-[#189aa4] transition-colors font-medium hover:cursor-pointer"
+                        type="submit"
                     >
                         Entrar
                     </button>
