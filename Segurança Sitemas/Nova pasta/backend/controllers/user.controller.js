@@ -7,7 +7,7 @@ export const createUser = async (req, res) => {
     //================
     //VALIDAÇÃO
     //================
-    if (!nome || typeof nome !== "string" || nome.trin().length <= 3) {
+    if (!nome || typeof nome !== "string" || nome.trim().length <= 3) {
         return res.status(400).json({ mensagem: "Nome inválido. Este campo é obrigatório", success: false })
     }
 
@@ -43,11 +43,11 @@ export const createUser = async (req, res) => {
     //remove hifen e ponto
     const cpfLimpo = cpf.replace(/\D/g, "")
 
-    const nomeSanitizado = nome.trim().replace(/\s+/g, "")
+    const nomeSanitizado = nome.trim().replace(/[@#\/!$%?]/g, "")
 
     //inserção no banco
     try {
-        const sql = `INSET INTO usuario (nome, email, senha, cpf) VALUES (?, ?, ?, ?)`
+        const sql = `INSERT INTO usuario (nome, email, senha, cpf) VALUES (?, ?, ?, ?)`
 
         const valores = [
             nomeSanitizado, email, senha, cpfLimpo
