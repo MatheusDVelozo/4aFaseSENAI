@@ -1,9 +1,17 @@
-import {api} from "./api"
+import { api } from "./api";
 
-export async function login(email: string, senha: string) {
-    const response = await api.post('/login',  {email, senha})
-    if (!response.data.success) {
-        return false;
+export type Session = {
+    token: string;
+    user: {
+        id: number,
+        name: string,
+        email: string,
+        role: "admin" | "user"
     }
-    return true;
+}
+
+export async function login(email: string, password: string): Promise<Session> {
+    
+    const response = await api.post<Session>('/login', { email, password })
+    return response.data
 }
