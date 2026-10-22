@@ -1,39 +1,39 @@
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
-import { db } from "../config/database.js"
+import {registerLog} from "./log"
 
 
-
-
-
-export async function lista(req,res) {
-
-    const [rows] = await db.query("SELECT id, name , category FROM materials")
-    
-    return res.json(rows)
+// Lista materiais para qualquer usuario autenticado.
+export async function listMaterials(req, res) {
+  const [rows] = await req.app.locals.db.execute(
+    "SELECT id, name, category FROM materials ORDER BY id"
+  );
+  res.json(rows);
 }
 
+// Exclui material: a rota ja garante que apenas admin chega aqui.
+export async function deleteMaterial(req, res) {
+  const id = Number(req.params.id);
 
-export async function deleta(req,res) {
+  const usuario_id = 0
+  const acao = "DELETE"
+  const recurso_afetado = "materials"
+  const id_recurso_afetado = id
+  const 
+  const
 
-    const id = Number(req.params.id)
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ message: "ID invalido." });
+  }
 
-    if (!Number(id) <= 0 ) {
+  const [result] = await req.app.locals.db.execute(
+    "DELETE FROM materials WHERE id = ?",
+    [id]
+  );
 
-        return res.status(400).json({message:"ID Invalido"})
-        
+  if (!result.affectedRows) {
+    registerLog()
+    return res.status(404).json({ message: "Material nao encontrado." });
+  }
 
-    }
-
-
-    const [result] = await db.query("DELETE FROM materials WHERE id = ?",[id])
-    
-    if (!result.affectedRows) {
-
-        return res.status(404).json({message:"Material nao encontrado"})
-        
-    }
-
-    return res.status(204).end()
-
+  // 204 significa sucesso sem conte?do na resposta.
+  res.status(204).end();
 }

@@ -1,16 +1,11 @@
-import {api, errorMessage} from "./api";
+import { api } from "./api";
 
-interface User{
-    name: String,
-    email: String,
-    password: String
-}
-
-export async function register( {name, email, password}:User){
-    const response = await api.post("/register", {
-        name, 
-        email,
-        password
-    })
-    return errorMessage(response) 
+// O cadastro envia apenas os campos digitados; o perfil é definido na API.
+export async function register(name: string, email: string, password: string) {
+  const response = await api.post<{ message: string }>("/register", {
+    name,
+    email,
+    password,
+  });
+  return response.data;
 }

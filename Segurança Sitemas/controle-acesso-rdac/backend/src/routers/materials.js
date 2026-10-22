@@ -1,19 +1,12 @@
 import { Router } from "express";
-import { deleta,lista} from "../controller/materials.js";
-import { authenticate,requireRole } from "../middlewares/auth.js";
+import { listMaterials, deleteMaterial } from "../controllers/materials.js";
+import { authenticate, requireRole } from "../middleware/auth.js";
 
-
-
-const routerMaterials = Router()
-
-routerMaterials.use(authenticate)
-
-routerMaterials.get("/listar", lista)
-
-
-
-
-routerMaterials.delete("/:id",requireRole("admin"),deleta)
-
-
-export default routerMaterials
+const router = Router();
+// AUTENTICA??O: todas as rotas abaixo exigem um token v?lido.
+router.use(authenticate);
+// Admin e usu?rio podem consultar.
+router.get("/", listMaterials);
+// AUTORIZA??O (RBAC): apenas o perfil admin pode excluir.
+router.delete("/:id", requireRole("admin"), deleteMaterial);
+export default router;
